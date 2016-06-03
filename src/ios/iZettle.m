@@ -36,26 +36,11 @@ NSNumberFormatter *_numberFormatter;
         _timestamp = [NSDate date];
 
         if (paymentInfo != nil) {
-
-            NSString* msg = [NSString stringWithFormat: @"GOOD, %@", _lastReference];
-            CDVPluginResult* result = [CDVPluginResult
-                                       resultWithStatus:CDVCommandStatus_OK
-                                       messageAsString:msg];
-
-
-            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-
-
-
+            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:_lastReference];
         } else {
-
-            NSString* msg = [NSString stringWithFormat: @"BAD, %@", _lastReference];
-            CDVPluginResult* result = [CDVPluginResult
-                                       resultWithStatus:CDVCommandStatus_OK
-                                       messageAsString:msg];
-
-            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:_lastReference];
         }
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
 }
 
@@ -63,14 +48,13 @@ NSNumberFormatter *_numberFormatter;
 
 - (void) retrievePaymentInfoForReference:(CDVInvokedUrlCommand *)command {
     NSString* reference = [command.arguments objectAtIndex:0];
-    [[iZettleSDK shared] retrievePaymentInfoForReference:reference completion:^(iZettleSDKPaymentInfo *paymentInfo, NSError *error) {
-        if (paymentInfo != nil) {
+    [[iZettleSDK shared] retrievePaymentInfoForReference:reference presentFromViewController:self.viewController completion:^(iZettleSDKPaymentInfo *paymentInfo, NSError *error){
+        if(paymentInfo != nil) {
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[self convertPaymentInfo: paymentInfo]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         } else {
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: error.localizedDescription ];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
 
@@ -78,10 +62,10 @@ NSNumberFormatter *_numberFormatter;
     [[iZettleSDK shared] presentSettingsFromViewController:self.viewController];
 }
 
+
 - (void) setEnforcedUserAccount:(CDVInvokedUrlCommand*)command {
     NSString* email = [[command arguments] objectAtIndex:0];
     [iZettleSDK shared].enforcedUserAccount = email;
-    NSLog(@"Forced account: %@", [iZettleSDK shared].enforcedUserAccount);
 }
 
 - (NSDictionary*) convertPaymentInfo:(iZettleSDKPaymentInfo *)paymentInfo {
