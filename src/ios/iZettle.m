@@ -36,26 +36,11 @@ NSNumberFormatter *_numberFormatter;
         _timestamp = [NSDate date];
 
         if (paymentInfo != nil) {
-
-            NSString* msg = [NSString stringWithFormat: @"GOOD, %@", _lastReference];
-            CDVPluginResult* result = [CDVPluginResult
-                                       resultWithStatus:CDVCommandStatus_OK
-                                       messageAsString:msg];
-
-
-            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-
-
-
+            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:_lastReference];
         } else {
-
-            NSString* msg = [NSString stringWithFormat: @"BAD, %@", _lastReference];
-            CDVPluginResult* result = [CDVPluginResult
-                                       resultWithStatus:CDVCommandStatus_OK
-                                       messageAsString:msg];
-
-            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:_lastReference];
         }
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
 }
 
@@ -76,6 +61,7 @@ NSNumberFormatter *_numberFormatter;
 - (void) settings:(CDVInvokedUrlCommand *)command {
     [[iZettleSDK shared] presentSettingsFromViewController:self.viewController];
 }
+
 
 - (void) setEnforcedUserAccount:(CDVInvokedUrlCommand*)command {
     NSString* email = [[command arguments] objectAtIndex:0];
