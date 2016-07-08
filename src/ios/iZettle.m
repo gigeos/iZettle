@@ -35,10 +35,11 @@ NSNumberFormatter *_numberFormatter;
         _lastError = error;
         _timestamp = [NSDate date];
 
+        CDVPluginResult* result;
         if (paymentInfo != nil) {
-            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:_lastReference];
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:_lastReference];
         } else {
-            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:_lastReference];
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:_lastReference];
         }
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
@@ -49,10 +50,11 @@ NSNumberFormatter *_numberFormatter;
 - (void) retrievePaymentInfoForReference:(CDVInvokedUrlCommand *)command {
     NSString* reference = [command.arguments objectAtIndex:0];
     [[iZettleSDK shared] retrievePaymentInfoForReference:reference presentFromViewController:self.viewController completion:^(iZettleSDKPaymentInfo *paymentInfo, NSError *error){
+        CDVPluginResult* pluginResult;
         if(paymentInfo != nil) {
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[self convertPaymentInfo: paymentInfo]];
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[self convertPaymentInfo: paymentInfo]];
         } else {
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: error.localizedDescription ];
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: error.localizedDescription ];
         }
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
